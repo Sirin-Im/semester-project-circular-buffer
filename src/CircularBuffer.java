@@ -1,9 +1,6 @@
-package ru.kpfu.itis.group101.imamov.c2.asd;
+package ru.kpfu.itis.group101.komissarov.course1.term2.ASD;
 
-import java.util.AbstractQueue;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,36 +15,37 @@ import java.util.stream.Stream;
  * @see java.util.Queue
  * @param <T> the type of elements held in this collection
  */
-public class MyQueue<T> extends AbstractQueue<T> {
-    private static final int DEFAULT_LONG_QUEUE = 10;
+public class CircularBuffer<T> extends AbstractQueue<T> {
+    private static final int DEFAULT_LONG_QUEUE = 16;
 
     private int size;
     private final int capacity;
     private final T[] queue;
-    private int  firstElemIndex;
-    private int lastElemIndex;
+    private int head;
+    private int tail;
 
     /**
      * Default constructor
      */
-    public MyQueue() {
+    public CircularBuffer() {
         this.queue = (T[])(new Object[DEFAULT_LONG_QUEUE]);
         this.size = 0;
         this.capacity = DEFAULT_LONG_QUEUE;
-        firstElemIndex = 0;
-        lastElemIndex = -1;
+        head = 0;
+        tail = -1;
     }
 
     /**
-     * Constructs a queue of a certain size.
-     * @param capacity the queue size.
+     *
+     * @param collection is a collection that is been needed to add into a new collection
      */
-    public MyQueue(int capacity) {
-        this.queue = (T[])(new Object[capacity]);
-        this.size = 0;
-        this.capacity = capacity;
-        firstElemIndex = 0;
-        lastElemIndex = -1;
+    public CircularBuffer(Collection<? extends T> collection) {
+        this();
+        for (T elem: collection) {
+            if (elem != null) {
+                offer(elem);
+            }
+        }
     }
 
     /**
@@ -99,22 +97,22 @@ public class MyQueue<T> extends AbstractQueue<T> {
             throw new NullPointerException("Unsupported element");
         }
         if (size == capacity) {
-            firstElemIndex++;
-            lastElemIndex++;
-            if (lastElemIndex == capacity) {
-                lastElemIndex = 0;
+            head++;
+            tail++;
+            if (tail == capacity) {
+                tail = 0;
             }
-            if (firstElemIndex == capacity) {
-                firstElemIndex = 0;
+            if (head == capacity) {
+                head = 0;
             }
-            queue[lastElemIndex] = o;
+            queue[tail] = o;
         } else {
-            if (lastElemIndex == capacity-1) {
-                lastElemIndex = 0;
+            if (tail == capacity-1) {
+                tail = 0;
             } else {
-                lastElemIndex++;
+                tail++;
             }
-            queue[lastElemIndex] = o;
+            queue[tail] = o;
             size++;
         }
         return true;
@@ -129,19 +127,19 @@ public class MyQueue<T> extends AbstractQueue<T> {
         if (size == 0) {
             return null;
         } else {
-            T pollElement = queue[firstElemIndex];
-            if ((firstElemIndex < lastElemIndex)|(size == 1)) {
-                queue[firstElemIndex] = null;
+            T pollElement = queue[head];
+            if ((head < tail)|(size == 1)) {
+                queue[head] = null;
                 size--;
-                firstElemIndex++;
+                head++;
                 return pollElement;
             } else {
-                queue[firstElemIndex] = null;
+                queue[head] = null;
                 size--;
-                if (firstElemIndex == capacity-1) {
-                    firstElemIndex = 0;
+                if (head == capacity-1) {
+                    head = 0;
                 } else {
-                    firstElemIndex++;
+                    head++;
                 }
                 return pollElement;
             }
@@ -157,7 +155,7 @@ public class MyQueue<T> extends AbstractQueue<T> {
         if (size == 0) {
             return null;
         } else {
-            return queue[firstElemIndex];
+            return queue[head];
         }
     }
 
@@ -185,7 +183,7 @@ public class MyQueue<T> extends AbstractQueue<T> {
         /**
          * Indicates the next iterable element.
          */
-        private int cursor = firstElemIndex;
+        private int cursor = head;
         private int countDeletedElements;
         private boolean lastElementPassed = false;
 
@@ -199,7 +197,7 @@ public class MyQueue<T> extends AbstractQueue<T> {
             if (cursor == size + countDeletedElements) {
                 cursor = countDeletedElements;
             }
-            if (cursor == lastElemIndex) {
+            if (cursor == tail) {
                 lastElementPassed = true;
             }
             int index = cursor;
@@ -212,11 +210,11 @@ public class MyQueue<T> extends AbstractQueue<T> {
          */
         @Override
         public void remove() {
-            queue[firstElemIndex] = null;
-            if (firstElemIndex == capacity) {
-                firstElemIndex = 0;
+            queue[head] = null;
+            if (head == capacity) {
+                head = 0;
             } else {
-                firstElemIndex++;
+                head++;
             }
             size--;
             countDeletedElements++;
@@ -238,7 +236,7 @@ public class MyQueue<T> extends AbstractQueue<T> {
         if ((this == null)||(this.getClass() != o.getClass())) {
             return false;
         }
-        MyQueue d = (MyQueue) o;
+        CircularBuffer d = (CircularBuffer) o;
         if (this.getCapacity() != d.getCapacity()) {
             return false;
         }
@@ -260,8 +258,8 @@ public class MyQueue<T> extends AbstractQueue<T> {
     @Override
     public int hashCode() {
         return Arrays.stream(queue).filter(x -> x!= null).mapToInt((x) -> x.hashCode()).map(x -> x*31).sum()
-                + Integer.hashCode(size)*31 + Integer.hashCode(capacity)*31 + Integer.hashCode(firstElemIndex)*31
-                + Integer.hashCode(lastElemIndex)*31;
+                + Integer.hashCode(size)*31 + Integer.hashCode(capacity)*31 + Integer.hashCode(head)*31
+                + Integer.hashCode(tail)*31;
     }
 
     /**
@@ -272,9 +270,9 @@ public class MyQueue<T> extends AbstractQueue<T> {
     public String toString() {
         T[] normalisedQueue = (T[])(new Object[size]);
         boolean flag = true;
-        for (int i = firstElemIndex, indexNormalisedQueue = 0; flag == true; i++, indexNormalisedQueue++) {
+        for (int i = head, indexNormalisedQueue = 0; flag == true; i++, indexNormalisedQueue++) {
             normalisedQueue[indexNormalisedQueue] = queue[i];
-            if (i == lastElemIndex) {
+            if (i == tail) {
                 flag = false;
             }
             if (i == capacity-1) {
