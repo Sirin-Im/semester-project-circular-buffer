@@ -1,4 +1,4 @@
-package ru.kpfu.itis.group101.komissarov.course1.term2.hw3.task1;
+package ru.kpfu.itis.group101.imamov.c2.asd;
 
 import java.util.AbstractQueue;
 import java.util.Arrays;
