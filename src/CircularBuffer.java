@@ -1,4 +1,4 @@
-package ru.kpfu.itis.group101.komissarov.course1.term2.ASD;
+package ru.kpfu.itis.group101.imamov.c2.asd;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +31,18 @@ public class CircularBuffer<T> extends AbstractQueue<T> {
         this.queue = (T[])(new Object[DEFAULT_LONG_QUEUE]);
         this.size = 0;
         this.capacity = DEFAULT_LONG_QUEUE;
+        head = 0;
+        tail = -1;
+    }
+
+    /**
+     * Constructor with capacity
+     * @param capacity is a max length of array
+     */
+    public CircularBuffer(int capacity) {
+        this.queue = (T[])(new Object[capacity]);
+        this.size = 0;
+        this.capacity = capacity;
         head = 0;
         tail = -1;
     }
