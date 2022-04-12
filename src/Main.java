@@ -11,30 +11,32 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class Main {
+    GenerateCSVDataset generator;
+    Benchmark benchmark;
+    int[] size;
+    int sizeIndex;
 
-    public static void start() {
-        GenerateCSVDataset generator = new GenerateCSVDataset();
-        Benchmark benchmark = new Benchmark();
-        int[] size = new int[]{100,500,1000,5000,10000,25000,50000,100000,250000,500000,750000,1000000};
-        int sizeIndex = 0;
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Сирин\\IdeaProjects\\TestApp\\src\\ru\\kpfu\\itis\\group101\\imamov\\c2\\asd\\dataset\\PathsOfFiles"));
-            try {
-                String line = reader.readLine();
-                while (line != null) {
-                    generator.writeValues(size[sizeIndex], Paths.get(line));
-                    System.out.println(Arrays.toString(benchmark.execute(size[sizeIndex], Paths.get(line))));
-                    sizeIndex++;
-                    if (sizeIndex == size.length) {
-                        sizeIndex = 0;
-                    }
-                    line = reader.readLine();
+    public void init() {
+        generator = new GenerateCSVDataset();
+        benchmark = new Benchmark();
+        size = new int[]{100,500,1000,5000,10000,25000,50000,100000,250000,500000,750000,1000000};
+        sizeIndex = 0;
+    }
+    public void start() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Сирин\\IdeaProjects\\TestApp\\src\\ru\\kpfu\\itis\\group101\\imamov\\c2\\asd\\dataset\\PathsOfFiles"))) {
+            String line = reader.readLine();
+            while (line != null) {
+                generator.writeValues(size[sizeIndex], Paths.get(line));
+                System.out.println(Arrays.toString(benchmark.execute(size[sizeIndex], Paths.get(line))));
+                sizeIndex++;
+                if (sizeIndex == size.length) {
+                    sizeIndex = 0;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                line = reader.readLine();
             }
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -43,17 +45,8 @@ public class Main {
 
 
     public static void main(String[] args) {
-        start();
-
-
-
-
-//        CircularBuffer<Integer> d = new CircularBuffer<Integer>();
-//        d.offer(0);
-//        d.offer(1);
-//        d.offer(2);
-//        System.out.println(d);
-//        System.out.println(d.sizeEqualsCapacity());
-//        System.out.println(d.hashCode());
+        Main main = new Main();
+        main.init();
+        main.start();
     }
 }
