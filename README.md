@@ -71,6 +71,4 @@ git clone https://github.com/Sirin-Im/semester-project-circular-buffer.git.
 ## $Источники
 https://en.wikipedia.org/wiki/Circular_buffer  
 https://habr.com/ru/company/otus/blog/557310  
-https://translated.turbopages.org/proxy_u/en-ru.ru.3a95d1be-62570b71-cd8c6bc4-74722d776562/https/www.lifewire.com/csv-file-2622708
-
-
+https://javascopes.com/reading-and-writing-csvs-in-java-249bbeeb/
